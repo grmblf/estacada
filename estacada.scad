@@ -1,63 +1,86 @@
 
-estaques = [
-    [22, 1.21, 160, 0.3, 0],
-    [24, 1.13, -110, 0.2, 0.1],
-    [21, 1.18, 130, 0.1, -0.2],
-    [23, 1.06, -190, 0.15, 0.1],
-    [19, 1.17, 160, 0.3, 0.1],
-    [22, 1.12, 160, 0.3, -0.15],
-    [24.5, 1.02, 160, 0.3, -0.2],
-    [23.7, 1.11, -90, -0.2, 0.15],
-    [21.6, 1.14, 70, 0.3, -0.2],
-    [22.7, 1.21, -130, -0.1, 0.1],
-    [23, 1.06, -190, 0.15, 0.1],
-    [20.8, 1.17, 160, 0.3, 0.1]
+//  ESTACADA 24
+/*
+estaques = [ //alçada(mm), diàmetre(mm), torsió(º), desplaçament X(mm), desplaçament Y(mm)
+    [22.3, 2.5, 160, 0.1, 0.3],
+    [24.1, 2.3, -110, 0.1, -0.2],
+    [21.6, 2.4, 130, 0.1, 0.2],
+    [23.4, 2.3, -190, 0.1, 0.1],
+    [20.1, 2.2, 160, 0.1, -0.15],
+    [22.5, 2.4, 160, 0.1, 0.15],
+    [24.5, 2.5, 160, 0.1, -0.2]
 ];
+offsets = [0, 2.2, 4.2, 6.3, 8.2, 10.1, 12.3];
+quant = 6;
 
-offsets = [0, 1.2, 2.4, 3.4, 4.45, 5.74, 6.8, 8.25, 9.0, 10.5, 11.65, 12.6];
 
-module estaca(he,di,tw,tx,ty) {
+//  ESTACADA 28
+estaques = [ //alçada(mm), diàmetre(mm), torsió(º), desplaçament X(mm), desplaçament Y(mm)
+    [22.3, 2.8, 160, 0.1, 0.3],
+    [24.1, 2.6, -110, 0.1, -0.2],
+    [21.6, 3.0, 130, 0.1, 0.2],
+    [23.4, 2.9, -190, 0.1, 0.1],
+    [20.1, 2.7, 160, 0.1, -0.15],
+    [22.5, 2.8, 160, 0.1, 0.15]
+];
+offsets = [0, 2.6, 5.2, 7.9, 10.2, 12.1];
+quant = 5;
+*/
+
+//  ESTACADA 32
+estaques = [ //alçada(mm), diàmetre(mm), torsió(º), desplaçament X(mm), desplaçament Y(mm)
+    [22.3, 3.2, 160, 0.1, 0.3],
+    [24.1, 3.1, -110, 0.1, -0.2],
+    [21.6, 3.5, 130, 0.1, 0.2],
+    [23.4, 3.1, -190, 0.1, 0.1],
+    [20.1, 3.3, 160, 0.1, -0.15]
+];
+offsets = [0.3, 3.1, 6.1, 9.2, 12.0];
+quant = 4;
+
+
+
+module estaca(he,di,tw,tx,ty) { //alçada(mm), diàmetre(mm), torsió(º), desplaçament X(mm), desplaçament Y(mm)
     intersection() {
         //cilindre
-        translate([$dx,$dy,0])
-        linear_extrude(height=he,center=false,twist=tw,convexity=0/*,slices=he*/)
-        translate([tx,ty,0]) circle(d=di,$fn=10);
+        linear_extrude(height=he,center=false,twist=tw,convexity=0,slices=40)
+        translate([tx,ty,0]) circle(d=di,$fn=35);
         
         //punta
-        translate([$dx+cos(tw)*tx,$dy+cos(tw)*ty,0])
+        translate([cos(tw)*tx,cos(tw)*ty,0])
             linear_extrude(height=he,center=false,twist=tw/2,scale=[0,0],convexity=0)
-            circle(d=di*9,$fn=9);
+            circle(d=di*7,$fn=9);
     }
 }
 
-$dx=0;
-$dy=0;
 
-//estaca(estaques[0][0],estaques[0][1],estaques[0][2],estaques[0][3],estaques[0][4]);
-for(i=[0:11]){
-    $dx= offsets[i];
+//  PRIMER COSTAT (sobre X)
+for(i=[0:quant]){
+    translate([offsets[i],0,0])
     estaca(estaques[i][0],estaques[i][1],estaques[i][2],estaques[i][3],estaques[i][4]);
 }
+
 
 //  SEGON COSTAT (en diagonal  60º)
-for(i=[1:11]){
-    $dx= 12.5 + offsets[i]/3;
-    $dy= (offsets[i]/3)*2;
+translate([12.5,-1,0])
+rotate(60)
+for(i=[1:quant]){
+    translate([offsets[i],0,0])
     estaca(estaques[i][0],estaques[i][1],estaques[i][2],estaques[i][3],estaques[i][4]);
 }
 
-//  TERCER COSTAT (paral·lel a x)
-for(i=[1:11]){
-    $dx= offsets[i] + 16.6667;
-    $dy= 8.3333;
+//  TERCER COSTAT (paral·lel a X)
+translate([18.0,10.3,0])
+for(i=[1:quant]){
+    translate([offsets[i],0,0])
     estaca(estaques[i][0],estaques[i][1],estaques[i][2],estaques[i][3],estaques[i][4]);
 }
 
 //  QUART COSTAT (en diagonal  60º)
-echo (12.5*4/3);
-for(i=[1:11]){
-    $dx= 29.1667 + offsets[i]/3;
-    $dy= (offsets[i]+12.5)*2/3;
+translate([30.0,9.8,0])
+rotate(60)
+for(i=[1:quant]){
+    translate([offsets[i],0,0])
     estaca(estaques[i][0],estaques[i][1],estaques[i][2],estaques[i][3],estaques[i][4]);
 }
 
